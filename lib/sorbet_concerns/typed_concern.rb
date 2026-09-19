@@ -11,7 +11,7 @@ module SorbetConcerns
   # `class_methods` blocks, `self` is typed as the concern module (or its
   # ClassMethods submodule), not the including AR class. Every call to AR
   # class methods (validates, enum, belongs_to, define_method) requires
-  # T.bind(self, T.class_of(ApplicationRecord)) or T.unsafe(self).
+  # T.bind(self, T.class_of(ActiveRecord::Base)) or T.unsafe(self).
   #
   # TypedConcern provides two helpers that centralize this pattern:
   #
@@ -41,12 +41,13 @@ module SorbetConcerns
   #     end
   #   end
   #
-  # For concern authors, use `extend SorbetConcerns::TypedConcern` instead of
-  # `extend ActiveSupport::Concern` in your concern module, then use
-  # `typed_class` in your included/class_methods blocks:
+  # For concern authors: extend ActiveSupport::Concern as usual, and
+  # declare that models must include TypedConcern. Then typed_class is
+  # available in the concern's included block because it's a class method
+  # on the including model:
   #
   #   module MyConcern
-  #     extend SorbetConcerns::TypedConcern
+  #     extend ActiveSupport::Concern
   #
   #     included do
   #       typed_class.validates :status, presence: true
@@ -57,6 +58,11 @@ module SorbetConcerns
   #         new(status: :draft)
   #       end
   #     end
+  #   end
+  #
+  #   class Order < ActiveRecord::Base
+  #     include SorbetConcerns::TypedConcern  # must come first
+  #     include MyConcern
   #   end
   #
   # Design tradeoff: this is the best possible abstraction given Sorbet's
