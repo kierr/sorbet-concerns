@@ -17,10 +17,10 @@ Gem::Specification.new do |spec|
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
 
+  spec.add_dependency "activerecord", ">= 7.0"
   spec.add_dependency "activesupport", ">= 7.0"
   spec.add_dependency "sorbet-runtime"
 
-  spec.add_development_dependency "activerecord", ">= 7.0"
   spec.add_development_dependency "rspec", "~> 3.13"
   spec.add_development_dependency "sorbet-static"
   spec.add_development_dependency "sqlite3", "~> 2.0"
