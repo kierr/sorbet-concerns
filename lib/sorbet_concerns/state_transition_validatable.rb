@@ -1,7 +1,7 @@
 # typed: strong
 # frozen_string_literal: true
 
-require "active_support/concern"
+require 'active_support/concern'
 
 module SorbetConcerns
   # Validates that state transitions follow a declared transition map.
@@ -92,12 +92,11 @@ module SorbetConcerns
       allowed = transitions[previous_value]
 
       if allowed.nil?
-        if unknown_state_handler == :allow
-          return
-        else
-          T.bind(self, ActiveRecord::Base).errors.add(field, "unknown previous state '#{previous_value}'")
-          return
-        end
+        return if unknown_state_handler == :allow
+
+        T.bind(self, ActiveRecord::Base).errors.add(field, "unknown previous state '#{previous_value}'")
+
+        return
       end
 
       return if allowed.include?(current_value)

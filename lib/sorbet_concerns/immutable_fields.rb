@@ -1,7 +1,7 @@
 # typed: strong
 # frozen_string_literal: true
 
-require "active_support/concern"
+require 'active_support/concern'
 
 module SorbetConcerns
   # Validates that specified fields cannot change after creation (immutable)
@@ -81,7 +81,7 @@ module SorbetConcerns
         # Would need typed AR concern RBIs to remove.
         next if T.cast(attribute_in_database(attr.to_s), T.nilable(Object)).nil?
 
-        errors.add(attr, "cannot be changed after creation — create a replacement instead")
+        errors.add(attr, 'cannot be changed after creation — create a replacement instead')
       end
     end
 
@@ -98,7 +98,7 @@ module SorbetConcerns
         # Would need typed AR concern RBIs to remove.
         next if T.cast(attribute_in_database(attr.to_s), T.nilable(Object)).nil?
 
-        errors.add(attr, "cannot be changed once set")
+        errors.add(attr, 'cannot be changed once set')
       end
     end
   end

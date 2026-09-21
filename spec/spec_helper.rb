@@ -1,12 +1,20 @@
 # typed: strict
 # frozen_string_literal: true
 
-require "active_record"
-require "sorbet-runtime"
-require "sorbet-concerns"
+require 'simplecov'
+SimpleCov.start do
+  enable_coverage :branch
+  add_filter '/spec/'
+  add_filter '/vendor/'
+  minimum_coverage 95
+end
+
+require 'active_record'
+require 'sorbet-runtime'
+require 'sorbet-concerns'
 
 # In-memory SQLite database for testing
-ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
+ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
 
 # Suppress migration output during tests
 ActiveRecord::Migration.verbose = false
@@ -14,7 +22,7 @@ ActiveRecord::Migration.verbose = false
 # Create the schema for dummy models
 ActiveRecord::Schema.define do
   create_table :orders, force: true do |t|
-    t.string :status, null: false, default: "draft"
+    t.string :status, null: false, default: 'draft'
     t.string :entity_id
     t.string :country_id
     t.string :kind
@@ -25,7 +33,7 @@ ActiveRecord::Schema.define do
   end
 
   create_table :documents, force: true do |t|
-    t.string :phase, null: false, default: "draft"
+    t.string :phase, null: false, default: 'draft'
     t.timestamps null: false
   end
 end

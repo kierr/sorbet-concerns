@@ -1,7 +1,7 @@
 # typed: strong
 # frozen_string_literal: true
 
-require "active_support/concern"
+require 'active_support/concern'
 
 module SorbetConcerns
   # Thread-local transition guard for fields that must only be changed
@@ -86,7 +86,7 @@ module SorbetConcerns
       # Installs a before_update callback that blocks direct changes to the
       # given field unless authorized via allow_transition_on!.
       sig { params(field: Symbol, error_message: String).void }
-      def guard_transition_on(field, error_message: "must be changed through an authorized service")
+      def guard_transition_on(field, error_message: 'must be changed through an authorized service')
         # RATIONALE: define_method — metaprogramming in AS::Concern class_methods block.
         # Would need AS::Concern typed RBI to reconsider.
         T.bind(self, T.class_of(ActiveRecord::Base)).define_method(:"guard_#{field}_transition") do
