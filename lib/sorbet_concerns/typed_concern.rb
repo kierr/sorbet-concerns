@@ -7,7 +7,7 @@ module SorbetConcerns
   # Provides typed access to the including class, eliminating T.bind/T.unsafe
   # boilerplate in ActiveSupport::Concern blocks.
   #
-  # ActiveSupport::Concern is Sorbet-hostile: inside `included` and
+  # ActiveSupport::Concern is not type-safe under Sorbet: inside `included` and
   # `class_methods` blocks, `self` is typed as the concern module (or its
   # ClassMethods submodule), not the including AR class. Every call to AR
   # class methods (validates, enum, belongs_to, define_method) requires
@@ -69,7 +69,7 @@ module SorbetConcerns
   # fundamental limitation. A perfect solution (self automatically typed as
   # the including class) would require Sorbet to support generic modules or
   # first-class concern type inference, which it does not. An honest
-  # imperfect abstraction is better than pretending the problem doesn't exist.
+  # This is the best possible abstraction given the limitation.
   module TypedConcern
     extend ActiveSupport::Concern
     extend T::Sig

@@ -10,7 +10,7 @@ module SorbetConcerns
   # Prevents accidental direct mutation of guarded fields by installing a
   # before_update callback that blocks changes unless explicitly allowed.
   # Authorization is thread-local, so it is safe across concurrent requests
-  # and naturally scoped to the current transaction.
+  # and scoped to the current transaction.
   #
   # Usage:
   #   class Order < ActiveRecord::Base
@@ -43,7 +43,7 @@ module SorbetConcerns
   # RATIONALE: Extracted from thread-local transition guard patterns used to
   # ensure state changes go through service objects rather than direct AR updates.
   # The thread-local key per-instance approach avoids global locks and is
-  # naturally scoped to the request/transaction. Would need a different
+  # scoped to the request/transaction. Would need a different
   # authorization model (e.g., database-level locking, actor-based) to reconsider.
   module ThreadGuardedTransition
     extend ActiveSupport::Concern
@@ -58,8 +58,8 @@ module SorbetConcerns
       def allow_transition_on!(field, &_block)
         key = thread_key(field)
         # Save and restore the prior value so a nested block does not reset the
-        # flag to nil while the outer block is still executing (the inner ensure
-        # would otherwise wrongly block the outer save).
+        # flag to nil while the outer block is still executing (without this,
+        # the inner ensure would block the outer save).
         prior = Thread.current[key]
         Thread.current[key] = true
         yield

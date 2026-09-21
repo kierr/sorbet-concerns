@@ -4,7 +4,7 @@ Typed `ActiveSupport::Concern` building blocks for Sorbet + Rails. Every file is
 
 ## The Problem
 
-`ActiveSupport::Concern` is Sorbet-hostile. Inside `included` and `class_methods` blocks, `self` is typed as the concern module (or its `ClassMethods` submodule), not the including ActiveRecord class. Every call to AR class methods — `validates`, `enum`, `belongs_to`, `define_method` — requires `T.bind(self, T.class_of(ActiveRecord::Base))` or `T.unsafe(self)`.
+`ActiveSupport::Concern` is not type-safe under Sorbet. Inside `included` and `class_methods` blocks, `self` is typed as the concern module (or its `ClassMethods` submodule), not the including ActiveRecord class. Every call to AR class methods — `validates`, `enum`, `belongs_to`, `define_method` — requires `T.bind(self, T.class_of(ActiveRecord::Base))` or `T.unsafe(self)`.
 
 The standard workaround is hand-written RBI shims declaring stub methods on each concern module. A single codebase can accumulate hundreds of lines of these shims, which drift out of sync and provide no runtime safety.
 
@@ -144,7 +144,7 @@ end
 
 ## Composing Concerns
 
-The modules are designed to work together. A model that needs typed access, state validation, and transition authorization simply includes what it needs:
+The modules are designed to work together. A model that needs typed access, state validation, and transition authorization includes what it needs:
 
 ```ruby
 class Order < ActiveRecord::Base
