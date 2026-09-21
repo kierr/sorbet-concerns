@@ -1,6 +1,6 @@
 # sorbet-concerns
 
-Typed `ActiveSupport::Concern` building blocks for Sorbet + Rails, abstracted from a large private monolith. Every file is `typed: strong`.
+Typed `ActiveSupport::Concern` building blocks for Sorbet + Rails, abstracted from a large private monolith.
 
 ## Problem
 
@@ -10,7 +10,7 @@ The standard workaround is hand-written RBI shims declaring stub methods on each
 
 ## Solution
 
-Four modules that eliminate the boilerplate:
+Four modules that eliminate the boilerplate, all `typed: strong`:
 
 ### TypedConcern
 
