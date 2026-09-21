@@ -1,14 +1,14 @@
 # sorbet-concerns
 
-Typed `ActiveSupport::Concern` building blocks for Sorbet + Rails. Every file is `typed: strong`.
+Typed `ActiveSupport::Concern` building blocks for Sorbet + Rails, abstracted from a large private monolith. Every file is `typed: strong`.
 
-## The Problem
+## Problem
 
 `ActiveSupport::Concern` is not type-safe under Sorbet. Inside `included` and `class_methods` blocks, `self` is typed as the concern module (or its `ClassMethods` submodule), not the including ActiveRecord class. Every call to AR class methods — `validates`, `enum`, `belongs_to`, `define_method` — requires `T.bind(self, T.class_of(ActiveRecord::Base))` or `T.unsafe(self)`.
 
 The standard workaround is hand-written RBI shims declaring stub methods on each concern module. A single codebase can accumulate hundreds of lines of these shims, which drift out of sync and provide no runtime safety.
 
-## What This Gem Provides
+## Solution
 
 Four modules that eliminate the boilerplate:
 
