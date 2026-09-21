@@ -1,6 +1,6 @@
 # sorbet-concerns
 
-Typed `ActiveSupport::Concern` building blocks for Sorbet + Rails.
+Typed `ActiveSupport::Concern` building blocks for Sorbet + Rails. Every file is `typed: strong`.
 
 ## The Problem
 
@@ -96,12 +96,12 @@ doc.update(entity_id: 2)     # => false, errors[:entity_id]
 doc.update(source_id: 99)    # => false, errors[:source_id] — already set
 ```
 
-- **immutable_fields**: blocks any change after creation (nil → value is allowed on persisted records where the prior value was nil)
+- **immutable_fields**: blocks any change after creation. A nil immutable field can still be set on a persisted record (nil → value is allowed) because the field was not previously assigned a meaningful value.
 - **write_once_fields**: allows nil → value once, blocks value → different_value
 
 ### ThreadGuardedTransition
 
-Thread-local transition guard for fields that must only be changed through authorized service objects.
+Thread-local transition guard for fields that must only be changed through authorized service objects. Whereas `StateTransitionValidatable` controls *which* transitions are legal, `ThreadGuardedTransition` controls *who* can make them. Use both together when state machines must only be mutated through service objects.
 
 ```ruby
 class Order < ActiveRecord::Base
@@ -124,6 +124,13 @@ order.with_transition_allowed(:status) do
 end
 ```
 
+Predicate methods are available for conditional logic or debugging:
+
+```ruby
+Order.transition_allowed_on?(:status)   # class-level — true inside allow_transition_on! block
+order.transition_allowed?(:status)              # instance-level — true inside with_transition_allowed block
+```
+
 Nested calls are safe — the outer block's authorization is preserved:
 
 ```ruby
@@ -134,6 +141,39 @@ Order.allow_transition_on!(:status) do
   # still authorized — inner ensure restores outer value
 end
 ```
+
+## Composing Concerns
+
+The modules are designed to work together. A model that needs typed access, state validation, and transition authorization simply includes what it needs:
+
+```ruby
+class Order < ActiveRecord::Base
+  include SorbetConcerns::TypedConcern
+  include SorbetConcerns::StateTransitionValidatable
+  include SorbetConcerns::ThreadGuardedTransition
+
+  VALID_TRANSITIONS = {
+    "draft" => %w[submitted cancelled],
+    "submitted" => %w[approved cancelled],
+    "approved" => %w[shipped],
+    "shipped" => %w[delivered],
+    "cancelled" => %w[],
+    "delivered" => %w[]
+  }.freeze
+
+  # TypedConcern gives us typed_class for Sorbet-safe class method calls
+  typed_class.validates :status, presence: true
+  typed_class.enum :status, VALID_TRANSITIONS.keys.index_with(&:itself)
+
+  # StateTransitionValidatable enforces which transitions are legal
+  validate_state_transitions_on :status
+
+  # ThreadGuardedTransition enforces that only authorized code can change status
+  guard_transition_on :status
+end
+```
+
+Now `Order` has both transition validation (draft→approved is illegal) and transition authorization (direct `update(status:)` is blocked without `allow_transition_on!`).
 
 ## Installation
 
@@ -152,8 +192,21 @@ gem "sorbet-concerns", path: "~/git/github.com/kierr/sorbet-concerns"
 ## Requirements
 
 - Ruby >= 3.2
-- ActiveSupport >= 7.0
+- Rails >= 7.0 (ActiveRecord and ActiveSupport)
 - Sorbet (sorbet-runtime)
+
+## Development
+
+```
+bundle install
+bundle exec rake spec
+```
+
+Tests run against an in-memory SQLite database — no external setup required.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
