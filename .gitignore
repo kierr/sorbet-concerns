@@ -13,3 +13,8 @@
 mkmf.log
 Gemfile.lock
 vendor/bundle/
+
+# Agent state
+.claude/
+.agents/
+.pi/

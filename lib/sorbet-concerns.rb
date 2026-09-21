@@ -1,4 +1,4 @@
-# typed: strict
+# typed: strong
 # frozen_string_literal: true
 
-require "sorbet_concerns"
+require 'sorbet_concerns'

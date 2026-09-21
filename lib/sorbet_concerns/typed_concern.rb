@@ -1,7 +1,7 @@
 # typed: strong
 # frozen_string_literal: true
 
-require "active_support/concern"
+require 'active_support/concern'
 
 module SorbetConcerns
   # Provides typed access to the including class, eliminating T.bind/T.unsafe
@@ -68,8 +68,7 @@ module SorbetConcerns
   # Design tradeoff: this is the best possible abstraction given Sorbet's
   # fundamental limitation. A perfect solution (self automatically typed as
   # the including class) would require Sorbet to support generic modules or
-  # first-class concern type inference, which it does not. An honest
-  # This is the best possible abstraction given the limitation.
+  # first-class concern type inference, which it does not.
   module TypedConcern
     extend ActiveSupport::Concern
     extend T::Sig
